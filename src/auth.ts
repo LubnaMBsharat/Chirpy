@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { BadRequestError, ForbiddenError, UnauthorizedError } from "./errors.js";
 import { Request } from "express";
-
+import crypto from "crypto";
+import { NewRefreshToken } from "./db/schema.js";
 // we used this sub type from the JwtPayload type to narrow the type down to the keys we care about
 type Payload = Pick <JwtPayload, "iss"| "sub" | "iat" | "exp">;
 export async function hashPassword(password:string): Promise<string>{
@@ -17,14 +18,14 @@ export async function checkPasswordHash(password:string , hash: string): Promise
     return result;
 }
 
-export function makeJWT(userID: string, expiresIn: number, secret:string): string{
+export function makeJWT(userID: string, secret:string): string{
     // get the current time in seconds.
     const iat = Math.floor(Date.now()/1000);
     const payload: Payload = {
         iss: "chirpy",
         sub: userID,
         iat: iat,
-        exp: iat + expiresIn
+        exp: iat + 3600
     };
     const token = jwt.sign(payload,secret);
     return token;
@@ -56,3 +57,9 @@ export function getBearerToken(req:Request): string{
     }
     return barerToken;
 }
+
+export function makeRefreshToken(): string{
+    const hexData = crypto.randomBytes(32);
+    return hexData.toString("hex");
+}
+

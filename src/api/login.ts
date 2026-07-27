@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import z, { email } from "zod";
 import { BadRequestError, UnauthorizedError } from "../errors.js";
 import { getUserByEmail } from "../db/queries/users.js";
-import { checkPasswordHash, makeJWT } from "../auth.js";
+import { checkPasswordHash, makeJWT, makeRefreshToken } from "../auth.js";
 import { config } from "../config.js";
+import { createRefreshToken } from "../db/queries/refreshTokens.js";
+import { NewRefreshToken } from "../db/schema.js";
 
 const loginSchema = z.object({
     password : z.string(),
@@ -28,12 +30,17 @@ export async function handlerLogin(req: Request, res:Response){
     // make sure that the expires duration won't be more than one hour
     const expiresInSeconds = Math.min(result.data.expiresInSeconds, 3600);
     // make jwt to be used on all the auth required requests
-    const jwtToken = makeJWT(user.id,expiresInSeconds,config.api.jwtSecret);
+    const jwtToken = makeJWT(user.id,config.api.jwtSecret);
+
+    const refToken= makeRefreshToken();
+    // insert the refresh token data into the database 
+    const refreshToken = await createRefreshToken(refToken, user.id);
     res.status(200).json({
         id:user.id,
         createdAt: user.createdAt,
         updatedAt : user.createdAt,
         email: user.email,
-        token: jwtToken
+        token: jwtToken,
+        refreshToken: refreshToken.token
     })
 }
