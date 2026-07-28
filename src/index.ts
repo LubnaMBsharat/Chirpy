@@ -19,6 +19,7 @@ import { handlerRefresh } from "./api/refresh.js";
 import { handlerRevoke } from "./api/revoke.js";
 import { handlerUpdateUser } from "./api/users/updateUser.js";
 import { handlerDeleteChirp } from "./api/chirps/deleteChirp.js";
+import { handlerWebhook } from "./api/polka/webhooks.js";
 
 // max:1 means only one connection to the db bue to security reasons
 const migrationClient = postgres(config.db.dbURL,{max:1});
@@ -47,7 +48,8 @@ app.post('/api/revoke', handlerRevoke);
 app.post('/api/chirps',handlerCreateChirp);
 app.get('/api/chirps',handlerGetAllChirps);
 app.get('/api/chirps/:chirpId',handlerGetChirp);
-app.delete('/api/chirps/:chirpId', handlerDeleteChirp)
+app.delete('/api/chirps/:chirpId', handlerDeleteChirp);
+app.post('/api/polka/webhooks',handlerWebhook);
 
 //error handler middlewares
 app.use(middlewareErrorHandler);

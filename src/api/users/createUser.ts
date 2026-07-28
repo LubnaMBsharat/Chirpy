@@ -19,7 +19,8 @@ export async function handlerCreateUser(req:Request,res:Response){
     const hashedPassword = await hashPassword(result.data.password);
     const user: UserResponse = await createUser({
         email: result.data.email,
-        hashedPassword: hashedPassword
+        hashedPassword: hashedPassword,
+        isChirpyRed: false
     });
     // if any error occurred it will go direct to the middlewareErrorHandler
     res.status(201).json(user);

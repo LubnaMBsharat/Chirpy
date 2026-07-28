@@ -1,10 +1,10 @@
 import * as argon2  from "argon2";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { BadRequestError, ForbiddenError, UnauthorizedError } from "./errors.js";
+import { UnauthorizedError } from "./errors.js";
 import { Request } from "express";
 import crypto from "crypto";
-import { NewRefreshToken } from "./db/schema.js";
+
 // we used this sub type from the JwtPayload type to narrow the type down to the keys we care about
 type Payload = Pick <JwtPayload, "iss"| "sub" | "iat" | "exp">;
 export async function hashPassword(password:string): Promise<string>{
@@ -61,5 +61,18 @@ export function getBearerToken(req:Request): string{
 export function makeRefreshToken(): string{
     const hexData = crypto.randomBytes(32);
     return hexData.toString("hex");
+}
+
+//this will be used to get the APIKey from the req header for webhook from polka
+export function getAPIKey(req:Request){
+    const authHeader = req.get("Authorization");
+
+    if(!authHeader)
+        throw new UnauthorizedError("Authorization header requested");
+
+    const apiKey = authHeader.replace("ApiKey","").trim();
+    if(!apiKey)
+        throw new UnauthorizedError("API key is requested");
+    return apiKey;
 }
 

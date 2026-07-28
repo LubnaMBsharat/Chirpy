@@ -10,7 +10,8 @@ export async function createUser(user:NewUser){
         id:users.id,
         createdAt : users.createdAt,
         updatedAt: users.updatedAt,
-        email: users.email
+        email: users.email,
+        isChirpyRed: users.isChirpyRed
     });
     return result;
 }
@@ -38,7 +39,24 @@ export async function updateEmailAndPassword (userId: string ,email:string, pass
         id:users.id,
         createdAt : users.createdAt,
         updatedAt: users.updatedAt,
-        email: users.email
+        email: users.email,
+        isChirpyRed: users.isChirpyRed
+    });
+    return result;
+}
+
+export async function upgradeUserToChirpyRed(userId: string){
+    const [result] = await db
+    .update(users)
+    .set({
+        isChirpyRed: true,
+        updatedAt: new Date()
+    })
+    .where(
+        eq(users.id, userId)
+    )
+    .returning({
+        id: users.id
     });
     return result;
 }

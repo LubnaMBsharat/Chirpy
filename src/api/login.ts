@@ -40,6 +40,7 @@ export async function handlerLogin(req: Request, res:Response){
         createdAt: user.createdAt,
         updatedAt : user.createdAt,
         email: user.email,
+        isChirpyRed: user.isChirpyRed,
         token: jwtToken,
         refreshToken: refreshToken.token
     })
