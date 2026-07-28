@@ -322,6 +322,3 @@ src/
   index.ts                # app entry point — runs migrations, then starts the server
 ```
 
-## Note
-
-This is a learning project — some design decisions (like resetting the whole database via an admin endpoint) are intentionally simple and would need to change for a real production app. Feedback and suggestions are welcome!
